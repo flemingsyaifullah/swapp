@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_URLS } from '../api';
 
 interface Person {
     name: string;
@@ -14,7 +15,7 @@ const PeopleList: React.FC = () => {
     const [people, setPeople] = useState<Person[]>([]);
 
     useEffect(() => {
-        axios.get('https://swapi.dev/api/people/')
+        axios.get(API_URLS.peoples())
             .then(response => {
                 setPeople(response.data.results);
             })
@@ -29,7 +30,7 @@ const PeopleList: React.FC = () => {
             <table className="table table-hover">
                 <thead className="thead-light">
                     <tr>
-                        <th>#</th>
+                        <th>No.</th>
                         <th>Name</th>
                         <th>Birth Year</th>
                         <th>Gender</th>
