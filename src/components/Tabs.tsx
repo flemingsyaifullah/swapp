@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 
 interface TabProps {
-    films: { title: string; url: string }[];
+    films: { title: string; release_date: string; url: string }[];
     species: { name: string; url: string }[];
     starships: { name: string; url: string }[];
     vehicles: { name: string; url: string }[];
@@ -33,6 +33,7 @@ const Tabs: React.FC<TabProps> = ({ films, species, starships, vehicles }) => {
                                 <tr>
                                     <th>No.</th>
                                     <th>Title</th>
+                                    <th>Release Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,6 +41,7 @@ const Tabs: React.FC<TabProps> = ({ films, species, starships, vehicles }) => {
                                     <tr key={film.url + index}>
                                         <td>{index + 1}</td>
                                         <td>{film.title}</td>
+                                        <td>{film.release_date}</td>
                                     </tr>
                                 ))}
                             </tbody>

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import { API_URLS } from '../api';
 import Tabs from './Tabs';
-import Loading from './Loading'
+import Loading from './Loading';
 
 interface Person {
     name: string;
@@ -24,7 +24,7 @@ interface Person {
 const PeopleDetail: React.FC = () => {
     const { id = '0' } = useParams<{ id: string }>();
     const [person, setPerson] = useState<Person | null>(null);
-    const [films, setFilms] = useState<{ title: string; url: string }[]>([]);
+    const [films, setFilms] = useState<{ title: string; release_date: string; url: string }[]>([]);
     const [species, setSpecies] = useState<{ name: string; url: string }[]>([]);
     const [starships, setStarships] = useState<{ name: string; url: string }[]>([]);
     const [vehicles, setVehicles] = useState<{ name: string; url: string }[]>([]);
@@ -38,17 +38,49 @@ const PeopleDetail: React.FC = () => {
 
                 // Fetch related data
                 personData.films.forEach(url => {
-                    axios.get(url).then(res => setFilms(prev => [...prev, res.data]));
+                    axios.get(url).then(res => {
+                        setFilms(prev => {
+                            if (!prev.some(film => film.url === url)) {
+                                return [...prev, res.data];
+                            }
+                            return prev;
+                        });
+                    });
                 });
+
                 personData.species.forEach(url => {
-                    axios.get(url).then(res => setSpecies(prev => [...prev, res.data]));
+                    axios.get(url).then(res => {
+                        setSpecies(prev => {
+                            if (!prev.some(sp => sp.url === url)) {
+                                return [...prev, res.data];
+                            }
+                            return prev;
+                        });
+                    });
                 });
+
                 personData.starships.forEach(url => {
-                    axios.get(url).then(res => setStarships(prev => [...prev, res.data]));
+                    axios.get(url).then(res => {
+                        setStarships(prev => {
+                            if (!prev.some(starship => starship.url === url)) {
+                                return [...prev, res.data];
+                            }
+                            return prev;
+                        });
+                    });
                 });
+
                 personData.vehicles.forEach(url => {
-                    axios.get(url).then(res => setVehicles(prev => [...prev, res.data]));
+                    axios.get(url).then(res => {
+                        setVehicles(prev => {
+                            if (!prev.some(vehicle => vehicle.url === url)) {
+                                return [...prev, res.data];
+                            }
+                            return prev;
+                        });
+                    });
                 });
+
                 axios.get(API_URLS.homeworld(personData.homeworld)).then(res => setHomeworld(res.data));
             })
             .catch(error => {
