@@ -1,53 +1,42 @@
-// src/components/PeopleDetail.tsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { API_URLS } from '../api';
+import Tabs from './Tabs';
+import Loading from './Loading'
 
 interface Person {
     name: string;
     birth_year: string;
     gender: string;
+    height: string;
+    mass: string;
+    hair_color: string;
+    skin_color: string;
+    eye_color: string;
+    homeworld: string;
     films: string[];
     species: string[];
     starships: string[];
     vehicles: string[];
 }
 
-interface Film {
-    title: string;
-    url: string;
-}
-
-interface Species {
-    name: string;
-    url: string;
-}
-
-interface Starship {
-    name: string;
-    url: string;
-}
-
-interface Vehicle {
-    name: string;
-    url: string;
-}
-
 const PeopleDetail: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id = '0' } = useParams<{ id: string }>();
     const [person, setPerson] = useState<Person | null>(null);
-    const [films, setFilms] = useState<Film[]>([]);
-    const [species, setSpecies] = useState<Species[]>([]);
-    const [starships, setStarships] = useState<Starship[]>([]);
-    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const [films, setFilms] = useState<{ title: string; url: string }[]>([]);
+    const [species, setSpecies] = useState<{ name: string; url: string }[]>([]);
+    const [starships, setStarships] = useState<{ name: string; url: string }[]>([]);
+    const [vehicles, setVehicles] = useState<{ name: string; url: string }[]>([]);
+    const [homeworld, setHomeworld] = useState<{ name: string; url: string } | null>(null);
 
     useEffect(() => {
-        axios.get(`https://swapi.dev/api/people/${id}/`)
+        axios.get(API_URLS.people(id))
             .then(response => {
                 const personData: Person = response.data;
                 setPerson(personData);
 
-                // Fetch films, species, starships, vehicles
+                // Fetch related data
                 personData.films.forEach(url => {
                     axios.get(url).then(res => setFilms(prev => [...prev, res.data]));
                 });
@@ -60,31 +49,42 @@ const PeopleDetail: React.FC = () => {
                 personData.vehicles.forEach(url => {
                     axios.get(url).then(res => setVehicles(prev => [...prev, res.data]));
                 });
+                axios.get(API_URLS.homeworld(personData.homeworld)).then(res => setHomeworld(res.data));
             })
             .catch(error => {
                 console.error("Error fetching person data:", error);
             });
     }, [id]);
 
-    if (!person) return <div>Loading...</div>;
+    if (!person) return <div><Loading /></div>;
 
     return (
-        <div>
-            <h1>{person.name}</h1>
-            <p>Birth Year: {person.birth_year}</p>
-            <p>Gender: {person.gender}</p>
+        <div className="container mt-4">
+            <div className="card">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                    <h2>{person.name}</h2>
+                    <Link
+                        to="/"
+                        className="btn"
+                        style={{ backgroundColor: 'orange', color: 'white' }}
+                    >
+                        Back to People List
+                    </Link>
+                </div>
+                <div className="card-body">
+                    <p><strong>Birth Year:</strong> {person.birth_year}</p>
+                    <p><strong>Gender:</strong> {person.gender}</p>
+                    <p><strong>Height:</strong> {person.height} cm</p>
+                    <p><strong>Mass:</strong> {person.mass} kg</p>
+                    <p><strong>Hair Color:</strong> {person.hair_color}</p>
+                    <p><strong>Skin Color:</strong> {person.skin_color}</p>
+                    <p><strong>Eye Color:</strong> {person.eye_color}</p>
+                    <p><strong>Homeworld:</strong> {homeworld ? homeworld.name : 'Loading...'}</p>
 
-            <h2>Films</h2>
-            <ul>{films.map(film => <li key={film.url}>{film.title}</li>)}</ul>
-
-            <h2>Species</h2>
-            <ul>{species.map(sp => <li key={sp.url}>{sp.name}</li>)}</ul>
-
-            <h2>Starships</h2>
-            <ul>{starships.map(starship => <li key={starship.url}>{starship.name}</li>)}</ul>
-
-            <h2>Vehicles</h2>
-            <ul>{vehicles.map(vehicle => <li key={vehicle.url}>{vehicle.name}</li>)}</ul>
+                    {/* Use the Tabs component */}
+                    <Tabs films={films} species={species} starships={starships} vehicles={vehicles} />
+                </div>
+            </div>
         </div>
     );
 };

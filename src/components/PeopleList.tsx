@@ -2,9 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_URLS } from '../api';
 
 interface Person {
     name: string;
+    birth_year: string;
+    gender: string;
     url: string;
 }
 
@@ -12,7 +15,7 @@ const PeopleList: React.FC = () => {
     const [people, setPeople] = useState<Person[]>([]);
 
     useEffect(() => {
-        axios.get('https://swapi.dev/api/people/')
+        axios.get(API_URLS.peoples())
             .then(response => {
                 setPeople(response.data.results);
             })
@@ -22,15 +25,35 @@ const PeopleList: React.FC = () => {
     }, []);
 
     return (
-        <div>
+        <div className="container mt-4">
             <h1>People List</h1>
-            <ul>
-                {people.map((person, index) => (
-                    <li key={index}>
-                        <Link to={`/people/${index + 1}`}>{person.name}</Link>
-                    </li>
-                ))}
-            </ul>
+            <table className="table table-hover">
+                <thead className="thead-light">
+                    <tr>
+                        <th>No.</th>
+                        <th>Name</th>
+                        <th>Birth Year</th>
+                        <th>Gender</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {people.map((person, index) => (
+                        <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{person.name}</td>
+                            <td>{person.birth_year}</td>
+                            <td>{person.gender}</td>
+                            <td>
+                                <Link to={`/people/${index + 1}`} className="btn btn-sm"
+                                    style={{ backgroundColor: 'orange', color: 'white' }}>
+                                    View Details
+                                </Link>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 };
