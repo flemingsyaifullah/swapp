@@ -21,7 +21,7 @@ interface Person {
     vehicles: string[];
 }
 
-const PeopleDetail: React.FC = () => {
+const PersonDetail: React.FC = () => {
     const { id = '0' } = useParams<{ id: string }>();
     const [person, setPerson] = useState<Person | null>(null);
     const [films, setFilms] = useState<{ title: string; release_date: string; url: string }[]>([]);
@@ -121,4 +121,4 @@ const PeopleDetail: React.FC = () => {
     );
 };
 
-export default PeopleDetail;
+export default PersonDetail;
